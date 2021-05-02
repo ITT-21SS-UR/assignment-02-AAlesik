@@ -1,15 +1,14 @@
-# your implementation here
-
 import sys
 from PyQt5 import uic, Qt
-from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QListWidget, QListWidgetItem, QListView, QLineEdit, \
-    QDialog
-
-
-MAX_ITEMS_IN_LIST = 12
+from PyQt5.QtWidgets import QDialog
 
 
 class Calculator(QDialog):
+    """
+        Initiating all varbiables & UI...
+    """
+    MAX_ITEMS_IN_LIST = 12
+
     def __init__(self):
         super().__init__()
         self.calc_string = ""
@@ -23,7 +22,7 @@ class Calculator(QDialog):
         self.resize(500, 450)
 
         """
-            Declaring & Connecting all Buttons...
+            Declaring & connecting all buttons...
         """
 
         self.dial_res.clicked.connect(self.res_clicked)
@@ -47,7 +46,9 @@ class Calculator(QDialog):
         self.dial_8.clicked.connect(self.d8_clicked)
         self.dial_9.clicked.connect(self.d9_clicked)
 
-
+    """
+        Declaring button methods -.- ...
+    """
 
     def res_clicked(self):
         self.calc_result()
@@ -121,6 +122,10 @@ class Calculator(QDialog):
         self.calc_string += "9"
         self.update()
 
+    """
+        Update method:
+    """
+
     def update(self):
         try:
             eval(self.calc_string.replace(",", "."))
@@ -134,29 +139,36 @@ class Calculator(QDialog):
         self.result_label.setText(str(self.result))
         return
 
+    """
+        Handle keystroke:
+    """
+
     def keyPressEvent(self, event):
         k = event.key()
-        if (k == 16777219):  # keycode of Backspace
+        if k == 16777219:  # keycode of Backspace
             self.calc_string = self.calc_string[: -1]
             self.update()
             return
-        if (k > 128):
+        if k > 128:  # no relevant characters above this keyID
             return
         k = chr(k)
-        if (k == "."):
+        if k == ".":  # comma for dot
             k = ","
-        if (k == "="):
+        if k == "=":  # Wanna calculate result?
             if self.dial_res.isEnabled():
                 self.calc_result()
                 self.update()
                 return
-        if self.filter_char(k):
+        if self.filter_char(k):  # Last filter
             return
         self.calc_string += k
         self.update()
 
-    def calc_result(self):
+    """
+        Calculating results:
+    """
 
+    def calc_result(self):
 
         d_string = self.calc_string.replace(",", ".")
         d_string = eval(d_string)
@@ -168,8 +180,8 @@ class Calculator(QDialog):
         self.update_list()
         return
 
-
-    def filter_char(self, char):
+    @staticmethod
+    def filter_char(char):
         sym = ["/", "*", "-", "+", ","]
         if char.isnumeric():
             return False
@@ -177,10 +189,14 @@ class Calculator(QDialog):
             return False
         return True
 
+    """
+        Update & draw list of calculations (calc_list):
+    """
+
     def update_list(self):
         try:
             self.calc_list.insert(2, self.calc_list.pop(2) + self.calc_list.pop(2))
-            self.calc_list.pop(MAX_ITEMS_IN_LIST)
+            self.calc_list.pop(self.MAX_ITEMS_IN_LIST)
         except IndexError:
             pass
         self.last_Calc.clear()
@@ -191,16 +207,12 @@ class Calculator(QDialog):
                 pass
 
 
-
 def main():
     app = Qt.QApplication(sys.argv)
     win = Calculator()
     win.show()
     sys.exit(app.exec_())
 
-
-
-# PyQt5.QtWidgets.QMainWindow
 
 if __name__ == "__main__":
     main()
